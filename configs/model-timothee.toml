@@ -1,0 +1,22 @@
+[model]
+name = "Timothee"
+optimizer = "adam"
+loss = "sparse_categorical_crossentropy"
+
+[[model.layers]]
+type = "conv2d"
+padding = "same"
+filters = 32
+strides = [3, 3]
+
+[[model.layers]]
+type = "relu"
+
+[[model.layers]]
+type = "darbn"
+
+[[model.layers]]
+type = "flatten"
+
+[[model.output]]
+activation = "softmax"
