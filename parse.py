@@ -11,6 +11,13 @@ class Args:
     keywords: dict[str, str]
     positional: list[str]
 
+    def __getitem__(self, key):
+        if isinstance(key, slice) or isinstance(key, int):
+            return self.positional[key]
+        if key in self.keywords:
+            return self.keywords[key]
+        return key in self.flags
+
 
 def parse_args(args: list[str]) -> Args:
     """
