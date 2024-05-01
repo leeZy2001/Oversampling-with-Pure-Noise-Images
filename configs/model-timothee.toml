@@ -4,19 +4,19 @@ optimizer = "adam"
 loss = "sparse_categorical_crossentropy"
 
 [[model.layers]]
-type = "conv2d"
+layer_type = "conv2d"
 padding = "same"
 filters = 32
 strides = [3, 3]
 
 [[model.layers]]
-type = "relu"
+layer_type = "relu"
 
 [[model.layers]]
-type = "darbn"
+layer_type = "darbn"
 
 [[model.layers]]
-type = "flatten"
+layer_type = "flatten"
 
 [[model.output]]
 activation = "softmax"
