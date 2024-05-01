@@ -7,6 +7,7 @@ from tensorflow.keras.models import Model
 
 from model.darbn import CustomDARBN
 
+
 def build_model(input_shape, num_classes, model_config):
     """
     Constructs a model from a configuration and related dataset
@@ -24,7 +25,7 @@ def build_model(input_shape, num_classes, model_config):
 def build_optimizer(model_config):
     """Constructs an optimizer from a configuration."""
     match model_config["optimizer"]:
-        case 'adam':
+        case "adam":
             return optimizers.Adam()
     return None
 
@@ -32,12 +33,12 @@ def build_optimizer(model_config):
 def build_layer(layer_type, **options):
     """Constructs a layer from the type and set of options."""
     match layer_type:
-        case 'conv2d':
+        case "conv2d":
             return layers.Conv2D(*options)
-        case 'relu':
+        case "relu":
             return layers.ReLU(*options)
-        case 'darbn':
+        case "darbn":
             return CustomDARBN(*options)
-        case 'flatten':
+        case "flatten":
             return layers.Flatten(*options)
     return None

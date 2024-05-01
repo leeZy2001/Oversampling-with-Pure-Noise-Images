@@ -7,7 +7,7 @@ import sys
 import os
 
 # Only allow Tensorflow to print errors.
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 from parse import parse_args, parse_toml
 
@@ -53,5 +53,5 @@ def main():
     # TODO: Report statistics???
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
