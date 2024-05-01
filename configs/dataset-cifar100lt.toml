@@ -1,0 +1,8 @@
+[dataset]
+name = "cifar100"
+
+[dataset.trimming]
+shuffle_classes = true
+shuffle_files = true
+function = "linear"
+smallest_size = 0.1
