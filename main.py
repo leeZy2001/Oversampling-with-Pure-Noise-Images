@@ -19,6 +19,7 @@ def main():
     """
     cannot_continue = False
 
+    # Looking for mandatory arguments.
     args = parse_args(sys.argv[1:])
     if "dataset" not in args:
         print("Missing required parameter `--dataset=<dataset>`")
@@ -31,6 +32,7 @@ def main():
         print("An irrecoverable error occurred and the program must abort.")
         return
 
+    # Ensuring that configurations exist.
     dataset_path = "configs/dataset-" + args["dataset"] + ".toml"
     model_path = "configs/model-" + args["model"] + ".toml"
     if not os.path.exists(dataset_path):
@@ -44,9 +46,22 @@ def main():
         print("An irrecoverable error occurred and the program must abort.")
         return
 
-    dataset_config = parse_toml(dataset_path)
-    model_config = parse_toml(model_path)
-    # TODO: We should also check that the TOML is not malformed.
+    # Loading configurations.
+    try:
+        dataset_config = parse_toml(dataset_path)
+    except:
+        print(f"The dataset configuration at [{dataset_path}] was malformed.")
+        cannot_continue = True
+    try:
+        model_config = parse_toml(model_path)
+    except:
+        print(f"The model configuration at [{model_path}] was malformed.")
+        cannot_continue = True
+
+    if cannot_continue:
+        print("An irrecoverable error occurred and the program must abort.")
+        return
+
     # TODO: Call `build_dataset` from the `dataset` module.
     # TODO: Call `build_model` from the `model.builder` module.
     # TODO: Train the model.
