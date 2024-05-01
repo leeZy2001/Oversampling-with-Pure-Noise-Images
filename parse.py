@@ -50,11 +50,11 @@ def parse_args(args: list[str]) -> Args:
         if arg == "--":
             forced_positional = True
             continue
-        parts = arg.split('=')
+        parts = arg.split('=', 1)
         if len(parts) == 1:
             flags.add(parts[0][2:])
             continue
-        kwargs[parts[0][2:]] = '='.join(parts[1:])
+        kwargs[parts[0][2:]] = parts[1]
     return Args(flags, kwargs, posargs)
 
 
