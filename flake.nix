@@ -16,6 +16,7 @@
           name = "Python";
 
           buildInputs = [
+            pylint
             (python3.withPackages (ps: with ps; [
               python-lsp-server
               keras
