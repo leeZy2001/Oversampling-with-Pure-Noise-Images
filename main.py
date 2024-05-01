@@ -26,10 +26,10 @@ def main():
     dataset_path = "configs/dataset-" + args["dataset"] + ".toml"
     model_path = "configs/model-" + args["model"] + ".toml"
     if not os.path.exists(dataset_path):
-        print("Unable to locate dataset configuration.")
+        print(f"Unable to locate dataset configuration at [{dataset_path}].")
         cannot_continue = True
     if not os.path.exists(model_path):
-        print("Unable to locate model configuration.")
+        print(f"Unable to locate model configuration at [{model_path}].")
         cannot_continue = True
 
     if cannot_continue:
