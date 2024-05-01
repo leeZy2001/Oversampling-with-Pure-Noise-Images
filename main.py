@@ -1,5 +1,9 @@
 import sys
 import os
+
+# Only allow Tensorflow to print errors.
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 from parse import parse_args, parse_toml
 from model.builder import build_model, build_optimizer
 
