@@ -20,3 +20,9 @@ layer_type = "flatten"
 
 [[model.output]]
 activation = "softmax"
+
+[dataset.augmenting]
+# Pad the samples to equal X% of the size of the biggest class.
+pad_to_percent = 1.0
+# Replace X% of the padding with noise.
+replace_with_noise = 0.5
