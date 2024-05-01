@@ -18,6 +18,7 @@
           buildInputs = [
             pylint
             (python3.withPackages (ps: with ps; [
+              black
               python-lsp-server
               keras
               tensorflow
