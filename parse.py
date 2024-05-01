@@ -18,6 +18,9 @@ class Args:
             return self.keywords[key]
         return key in self.flags
 
+    def __contains__(self, item):
+        return item in self.flags or item in self.keywords
+
 
 def parse_args(args: list[str]) -> Args:
     """
