@@ -1,3 +1,7 @@
+"""
+Parsing utilities for command-line and TOML configurations.
+"""
+
 from dataclasses import dataclass
 from typing import Any
 import tomllib
@@ -12,7 +16,7 @@ class Args:
     positional: list[str]
 
     def __getitem__(self, key):
-        if isinstance(key, slice) or isinstance(key, int):
+        if isinstance(key, (slice, int)):
             return self.positional[key]
         if key in self.keywords:
             return self.keywords[key]
@@ -55,7 +59,7 @@ def parse_args(args: list[str]) -> Args:
 
 
 def parse_toml(filename: str) -> dict[str, Any]:
-    with open(filename, 'rb') as f:
-        data = tomllib.load(f)
+    """Parses a TOML file by file name."""
+    with open(filename, 'rb') as file:
+        data = tomllib.load(file)
     return data
-

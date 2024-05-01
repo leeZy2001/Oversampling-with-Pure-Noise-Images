@@ -2,15 +2,19 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 
-def lerp(start: float, end: float, t: float) -> float:
-    return start * t + end * (1 - t)
+def lerp(start: float, end: float, ratio: float) -> float:
+    return start * ratio + end * (1 - ratio)
 
 
-class CustomDAR_BN(Layer):
+class CustomDARBN(Layer):
     def __init__(self, momentum: float = 0.99, epsilon: float = 1e-3):
         super().__init__()
         self.momentum = momentum
         self.epsilon = epsilon
+        self.gamma = None
+        self.beta = None
+        self.moving_mean = None
+        self.moving_variance = None
 
     def build(self, input_shape):
         self.gamma = self.add_weight(name='gamma',
@@ -29,8 +33,9 @@ class CustomDAR_BN(Layer):
                                                shape=(input_shape[-1],),
                                                initializer='ones',
                                                trainable=False)
-    def _batch_norm(self, x, mean, var):
-        return self.gamma * (x - mean) / (tf.sqrt(var + self.epsilon)) + self.beta
+
+    def _batch_norm(self, value, mean, var):
+        return self.gamma * (value - mean) / (tf.sqrt(var + self.epsilon)) + self.beta
 
     def call(self, inputs, training=None):
         if training:
@@ -47,4 +52,3 @@ class CustomDAR_BN(Layer):
         return self._batch_norm(inputs,
                                 self.moving_mean,
                                 self.moving_variance)
-
