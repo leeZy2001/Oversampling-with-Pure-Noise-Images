@@ -1,5 +1,6 @@
 [dataset]
-name = "cifar10"
+name = "cifar10lt"
+source = "cifar10"
 
 [dataset.trimming]
 shuffle_classes = true
