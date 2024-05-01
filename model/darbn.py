@@ -2,8 +2,8 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 
-def lerp(from: float, to: float, t: float) -> float:
-    return from * t + to * (1 - t)
+def lerp(start: float, end: float, t: float) -> float:
+    return start * t + end * (1 - t)
 
 
 class CustomDAR_BN(Layer):
@@ -23,7 +23,7 @@ class CustomDAR_BN(Layer):
                                     trainable=True)
         self.moving_mean = self.add_weight(name='moving_mean',
                                            shape=(input_shape[-1],),
-                                           initializer='zeros'
+                                           initializer='zeros',
                                            trainable=False)
         self.moving_variance = self.add_weight(name='moving_variance',
                                                shape=(input_shape[-1],),

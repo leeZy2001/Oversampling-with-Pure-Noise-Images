@@ -1,4 +1,4 @@
-from tensorflow.keras import layers, optimizer
+from tensorflow.keras import layers, optimizers
 from tensorflow.keras.models import Model
 
 from model.darbn import CustomDAR_BN
