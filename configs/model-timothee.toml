@@ -26,3 +26,7 @@ activation = "softmax"
 pad_to_percent = 1.0
 # Replace X% of the padding with noise.
 replace_with_noise = 0.5
+
+[hyperparams]
+training_split = 0.8
+batch_size = 32
