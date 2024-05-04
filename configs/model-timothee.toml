@@ -39,4 +39,4 @@ replace_with_noise = 0.5
 [hyperparams]
 validation_split = 0.2
 batch_size = 32
-epochs = 1
+epochs = 2
