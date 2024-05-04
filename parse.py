@@ -4,8 +4,12 @@ Parsing utilities for command-line and TOML configurations.
 
 from dataclasses import dataclass
 from typing import Any
-import tomllib
-
+# 'tomllib' is part of the standard library as of 3.11.
+# 'toml' is used as a fallback.
+try:
+    import tomllib
+except ImportError:
+    import toml as tomllib
 
 @dataclass
 class Args:

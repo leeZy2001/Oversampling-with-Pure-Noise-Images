@@ -18,7 +18,7 @@ layer_type = "darbn"
 [[model.layers]]
 layer_type = "flatten"
 
-[[model.output]]
+[model.output]
 activation = "softmax"
 
 [dataset.augmenting]

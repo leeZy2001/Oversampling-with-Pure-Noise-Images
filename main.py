@@ -5,6 +5,7 @@ interface.
 
 import sys
 import os
+import tensorflow as tf
 
 # Only allow Tensorflow to print errors.
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
@@ -63,26 +64,24 @@ def main():
         print("An irrecoverable error occurred and the program must abort.")
         return
 
+    # Constructing the dataset.
     dataset_block = build_dataset(dataset_config["dataset"])
     training, validation = tf.keras.utils.split_dataset(dataset_block["training"], model_config["hyperparams"]["training_split"])
     testing = dataset_block["testing"]
     num_classes = dataset_block["num_classes"]
 
+
+    # Batching the dataset.
     batch_size = model_config["hyperparams"]["batch_size"]
     training.batch(batch_size)
     validation.batch(batch_size)
     testing.batch(batch_size)
 
+    # Getting the shape 
     for batch in training:
-        print(batch)
         shape = batch['image'].shape
         break
-
-    print(f"Batch Size: {batch_size}")
-    print(f"Shape: {shape}")
-
     # model = build_model(shape, num_classes, model_config["model"])
-
     # TODO: Train the model.
     # TODO: Report statistics???
 

@@ -12,7 +12,7 @@ def get_scaling_function(fn_config: dict[str, Any], num_classes: int):
     match fn_config["function"]:
         case "linear":
             smallest_size = fn_config["smallest_size"]
-            return lambda n: smallest_size + (1 - smallest_size) * n / num_classes
+            return lambda n: smallest_size + (1 - smallest_size) * n / (num_classes - 1)
     return None
 
 
@@ -38,7 +38,7 @@ def build_dataset(dataset_config: dict[str, Any]):
                 random.shuffle(organized[label])
             upper = int(max_size * scaling_fn(index))
             organized[label] = organized[label][:upper]
-        combined = [(label, image) for image in organized[label] for label in organized.keys()]
+        combined = [(label, image) for label, images in organized.items() for image in images]
         random.shuffle(combined)
         images = []
         labels = []
@@ -47,12 +47,16 @@ def build_dataset(dataset_config: dict[str, Any]):
             labels.append(label)
         image_tensor = tf.convert_to_tensor(images)
         label_tensor = tf.constant(labels)
-        training_dataset = tf.data.Dataset.from_tensor_slices((image_tensor, label_tensor))
+        training_dataset = tf.data.Dataset.from_tensor_slices({'image': image_tensor, 'label': label_tensor})
     return {
         "training": training_dataset,
         "testing": testing_dataset,
         "num_classes": info.features['label'].num_classes
     }
+
+
+def augment_dataset(dataset, augment_config):
+    pass    
 
 
 def generate_noise_images(
