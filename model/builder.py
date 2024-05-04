@@ -31,10 +31,10 @@ def build_optimizer(model_config):
 
 
 def build_callbacks(model_config):
-    callbacks = []
-    for callback_cfg in model_config["callbacks"]:        
-        callbacks.append(build_single_callback(callback_cfg))
-    return callbacks
+    model_callbacks = []
+    for callback_cfg in model_config["callbacks"]:
+        model_callbacks.append(build_single_callback(**callback_cfg))
+    return model_callbacks
 
 
 def build_single_callback(callback_type, **options):
