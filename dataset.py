@@ -5,7 +5,8 @@ Utilities for generating and augmenting datasets.
 import numpy as np
 import random
 from typing import Any
-import tensorflow_dataset
+import tensorflow_datasets as tfds
+import tensorflow as tf
 
 def get_scaling_function(fn_config: dict[str, Any], num_classes: int):
     match fn_config["function"]:
@@ -19,14 +20,14 @@ def build_dataset(dataset_config: dict[str, Any]):
     """Constructs a dataset from a configuration."""
     datasets, info = tfds.load(dataset_config["source"], with_info=True)
     training_dataset = datasets["train"]
-    testing_dataset = datasets["testing"]
+    testing_dataset = datasets["test"]
     if "trimming" in dataset_config:
         organized = {}
-        for label in info.features['label'].names:
+        for label in range(info.features['label'].num_classes):
             organized[label] = []
         for example in training_dataset:
             image, label = example['image'], example['label']
-            organized[label].append(image)
+            organized[int(label)].append(image)
         scaling_fn = get_scaling_function(dataset_config["trimming"], info.features['label'].num_classes)
         max_size = max(len(l) for l in organized.values())
         labels = [*organized.keys()]
@@ -44,9 +45,9 @@ def build_dataset(dataset_config: dict[str, Any]):
         for label, image in combined:
             images.append(image)
             labels.append(label)
-        image_tensor = tf.constant(images)
+        image_tensor = tf.convert_to_tensor(images)
         label_tensor = tf.constant(labels)
-        training_dataset = Dataset.from_tensor_slices((image_tensor, label_tensor))
+        training_dataset = tf.data.Dataset.from_tensor_slices((image_tensor, label_tensor))
     return {
         "training": training_dataset,
         "testing": testing_dataset,

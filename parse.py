@@ -60,6 +60,5 @@ def parse_args(args: list[str]) -> Args:
 
 def parse_toml(filename: str) -> dict[str, Any]:
     """Parses a TOML file by file name."""
-    with open(filename, "rb") as file:
-        data = tomllib.load(file)
+    data = tomllib.load(filename)
     return data
