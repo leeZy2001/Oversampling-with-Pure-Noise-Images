@@ -3,6 +3,7 @@ name = "Timothee"
 optimizer = "adam"
 loss = "sparse_categorical_crossentropy"
 
+
 [[model.layers]]
 layer_type = "conv2d"
 padding = "same"
@@ -21,6 +22,14 @@ layer_type = "flatten"
 [model.output]
 activation = "softmax"
 
+
+[[model.callbacks]]
+callback_type = "early_stopping"
+monitor = "val_loss"
+min_delta = "1e-2"
+patience = "5"
+
+
 [dataset.augmenting]
 # Pad the samples to equal X% of the size of the biggest class.
 pad_to_percent = 1.0
@@ -28,5 +37,6 @@ pad_to_percent = 1.0
 replace_with_noise = 0.5
 
 [hyperparams]
-training_split = 0.8
+validation_split = 0.2
 batch_size = 32
+epochs = 1

@@ -66,24 +66,39 @@ def main():
 
     # Constructing the dataset.
     dataset_block = build_dataset(dataset_config["dataset"])
-    training, validation = tf.keras.utils.split_dataset(dataset_block["training"], model_config["hyperparams"]["training_split"])
+    training = dataset_block["training"]
     testing = dataset_block["testing"]
     num_classes = dataset_block["num_classes"]
 
-
-    # Batching the dataset.
-    batch_size = model_config["hyperparams"]["batch_size"]
-    training.batch(batch_size)
-    validation.batch(batch_size)
-    testing.batch(batch_size)
-
-    # Getting the shape 
-    for batch in training:
-        shape = batch['image'].shape
+    # Getting the shape
+    for sample in training:
+        shape = sample["image"].shape
         break
-    # model = build_model(shape, num_classes, model_config["model"])
-    # TODO: Train the model.
-    # TODO: Report statistics???
+
+    model = build_model(shape, num_classes, model_config["model"])
+    optimizer = build_optimizer(model_config["model"])
+    if "callbacks" in model_config["model"]:
+        callbacks = build_callbacks(model_config["model"])
+    else:
+        callbacks = []
+
+    model.compile(
+        optimizer=optimizer, loss=model_config["model"]["loss"], metrics=["accuracy"]
+    )
+
+    model.fit(
+        training,
+        validation_split=model_config["hyperparams"]["validation_split"],
+        epochs=model_config["hyperparams"]["epochs"],
+        batch_size=model_config["hyperparams"]["batch_size"],
+        callbacks=callbacks,
+    )
+
+    results = model.evaluate(
+        testing, batch_size=model_config["hyperparams"]["batch_size"],
+    )
+
+    print(results)
 
 
 if __name__ == "__main__":
