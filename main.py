@@ -10,6 +10,7 @@ import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 from parse import parse_args, parse_toml
+from dataset import build_dataset
 
 
 def main():
@@ -62,8 +63,26 @@ def main():
         print("An irrecoverable error occurred and the program must abort.")
         return
 
-    # TODO: Call `build_dataset` from the `dataset` module.
-    # TODO: Call `build_model` from the `model.builder` module.
+    dataset_block = build_dataset(dataset_config["dataset"])
+    training, validation = tf.keras.utils.split_dataset(dataset_block["training"], model_config["hyperparams"]["training_split"])
+    testing = dataset_block["testing"]
+    num_classes = dataset_block["num_classes"]
+
+    batch_size = model_config["hyperparams"]["batch_size"]
+    training.batch(batch_size)
+    validation.batch(batch_size)
+    testing.batch(batch_size)
+
+    for batch in training:
+        print(batch)
+        shape = batch['image'].shape
+        break
+
+    print(f"Batch Size: {batch_size}")
+    print(f"Shape: {shape}")
+
+    # model = build_model(shape, num_classes, model_config["model"])
+
     # TODO: Train the model.
     # TODO: Report statistics???
 
