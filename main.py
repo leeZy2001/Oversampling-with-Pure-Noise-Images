@@ -34,6 +34,9 @@ def main():
         shape = sample["image"].shape
         break
 
+    if "dataset" in model_config and "augmenting" in model_config["dataset"]:
+        training = augment_dataset(training, num_classes, shape, model_config["dataset"]["augmenting"])
+
     model = build_model(shape, num_classes, model_config["model"])
     optimizer = build_optimizer(model_config["model"])
     if "callbacks" in model_config["model"]:
