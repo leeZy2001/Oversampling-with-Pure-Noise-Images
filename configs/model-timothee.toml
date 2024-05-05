@@ -8,7 +8,7 @@ loss = "sparse_categorical_crossentropy"
 layer_type = "conv2d"
 padding = "same"
 filters = 32
-strides = [3, 3]
+kernel_size = [3, 3]
 
 [[model.layers]]
 layer_type = "relu"
@@ -31,9 +31,7 @@ patience = "5"
 
 
 [dataset.augmenting]
-# Pad the samples to equal X% of the size of the biggest class.
 pad_to_percent = 1.0
-# Replace X% of the padding with noise.
 replace_with_noise = 0.5
 
 [hyperparams]
