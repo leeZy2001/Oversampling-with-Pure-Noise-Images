@@ -11,7 +11,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 from parse import parse_args, parse_toml
 from model.builder import build_model, build_optimizer, build_callbacks
-from dataset import build_dataset, augment_dataset
+from dataset import build_dataset, augment_dataset, into_workable
+import tensorflow as tf
 
 
 def main():
@@ -19,86 +20,92 @@ def main():
     Configures and tests a model on a dataset according to command-line
     arguments.
     """
-    # Looking for mandatory arguments.
     args = parse_args(sys.argv[1:])
-    dataset_config, model_config = get_configs_from(args)
+    verify_necessary_args_are_present(args)
 
-    # Constructing the dataset.
-    dataset_block = build_dataset(dataset_config["dataset"])
-    training = dataset_block["training"]
-    testing = dataset_block["testing"]
-    num_classes = dataset_block["num_classes"]
+    dataset_config = get_dataset_config(args)
+    model_configs = get_all_model_configs(args)
 
-    # Getting the shape
-    for sample in training:
-        shape = sample["image"].shape
-        break
+    print(f"Building dataset [{dataset_config['dataset']['name']}]...")
+    full_training, testing, num_classes, shape = get_dataset_from_config(dataset_config)
 
-    if "dataset" in model_config and "augmenting" in model_config["dataset"]:
-        training = augment_dataset(training, num_classes, shape, model_config["dataset"]["augmenting"])
+    for model_config in model_configs:
+        model_name = model_config["model"]["name"]
+        print(f"Building model [{model_name}]...")
 
-    model = build_model(shape, num_classes, model_config["model"])
-    optimizer = build_optimizer(model_config["model"])
-    if "callbacks" in model_config["model"]:
-        callbacks = build_callbacks(model_config["model"])
-    else:
-        callbacks = []
+        model = build_model(shape, num_classes, model_config["model"])
+        optimizer = build_optimizer(model_config["model"])
+        if "callbacks" in model_config["model"]:
+            callbacks = build_callbacks(model_config["model"])
+        else:
+            callbacks = []
 
-    model.compile(
-        optimizer=optimizer, loss=model_config["model"]["loss"], metrics=["accuracy"]
-    )
+        model.compile(
+            optimizer=optimizer, loss=model_config["model"]["loss"], metrics=["accuracy"]
+        )
 
-    model.fit(
-        training,
-        validation_split=model_config["hyperparams"]["validation_split"],
-        epochs=model_config["hyperparams"]["epochs"],
-        batch_size=model_config["hyperparams"]["batch_size"],
-        callbacks=callbacks,
-    )
+        if "dataset" in model_config and "augmenting" in model_config["dataset"]:
+            print(f"Augmenting dataset for model [{model_name}]...")
+            personal_training = augment_dataset(full_training, num_classes, shape, model_config["dataset"]["augmenting"])
+        else:
+            personal_training = full_training
 
-    results = model.evaluate(
-        testing,
-        batch_size=model_config["hyperparams"]["batch_size"],
-    )
+        print(f"Splitting training and validation for model [{model_name}]...")
+        training, validation = tf.keras.utils.split_dataset(personal_training, right_size=model_config["hyperparams"]["validation_split"])
 
-    print(results)
+        batch_size = model_config["hyperparams"]["batch_size"]
+        print(f"Training model [{model_name}]...")
+
+        model.fit(
+            into_workable(training, batch_size=batch_size),
+            validation_data=into_workable(validation, batch_size=batch_size),
+            epochs=model_config["hyperparams"]["epochs"],
+            callbacks=callbacks,
+        )
+
+        print(f"Evaluating model [{model_name}]...")
+        results = model.evaluate(into_workable(testing, batch_size=batch_size))
+
+        print(results)
 
 
-def get_configs_from(args):
+def verify_necessary_args_are_present(args):
     errors = []
     if "dataset" not in args:
         errors.append("Missing required parameter `--dataset=<dataset>`")
     if "model" not in args:
         errors.append("Missing required parameter `--model=<model>`")
-
     if len(errors) > 0:
         raise KeyError(*errors)
 
-    # Ensuring that configurations exist.
+
+def get_dataset_config(args):
     dataset_path = "configs/dataset-" + args["dataset"] + ".toml"
-    model_path = "configs/model-" + args["model"] + ".toml"
     if not os.path.exists(dataset_path):
-        errors.append(f"Unable to locate dataset configuration at [{dataset_path}].")
-    if not os.path.exists(model_path):
-        errors.append(f"Unable to locate model configuration at [{model_path}].")
+        raise FileNotFoundError(f"Unable to locate dataset configuration at [{dataset_path}].")
+    return parse_toml(dataset_path)
 
-    if len(errors) > 0:
-        raise KeyError(*errors)
 
-    # Loading configurations.
-    try:
-        dataset_config = parse_toml(dataset_path)
-    except Exception as e:
-        errors.append(e)
-    try:
-        model_config = parse_toml(model_path)
-    except Exception as e:
-        errors.append(e)
+def get_all_model_configs(args):
+    model_names = args["model"].split(",")
+    configs = []
+    for model_name in model_names:
+        model_path = "configs/model-" + model_name + ".toml"
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Unable to locate model configuration at [{model_path}].")
+        configs.append(parse_toml(model_path))
+    return configs
 
-    if len(errors) > 0:
-        raise ValueError(*errors)
 
-    return dataset_config, model_config
+def get_dataset_from_config(dataset_config):
+    dataset_block = build_dataset(dataset_config["dataset"])
+    full_training = dataset_block["training"]
+    testing = dataset_block["testing"]
+    num_classes = dataset_block["num_classes"]
+    for sample in full_training:
+        shape = sample["image"].shape
+        break
+    return full_training, testing, num_classes, shape
 
 
 if __name__ == "__main__":

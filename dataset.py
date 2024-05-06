@@ -85,15 +85,18 @@ def flatten_dataset(organized, shuffle=True):
     ]
     if shuffle:
         random.shuffle(combined)
+    ids = []
     images = []
     labels = []
-    for label, image in combined:
+    for idnum, (label, image) in enumerate(combined):
+        ids.append(idnum)
         images.append(image)
         labels.append(label)
+    id_tensor = tf.constant(ids)
     image_tensor = tf.convert_to_tensor(images)
     label_tensor = tf.constant(labels)
     return tf.data.Dataset.from_tensor_slices(
-        {"image": image_tensor, "label": label_tensor}
+        {"id": id_tensor, "image": image_tensor, "label": label_tensor}
     )
 
 
@@ -120,3 +123,16 @@ def generate_noise_images(
         ), tf.uint8)
         for _ in range(num_images)
     ]
+
+
+def into_workable(dataset, batch_size=None, cast=tf.float32):
+    """Converts a dataset into a tuple-formatted dataset, as expected by `model.fit`."""
+    images = []
+    labels = []
+    for sample in dataset:
+        images.append(tf.cast(sample['image'], cast))
+        labels.append(sample['label'])
+    image_tensor = tf.convert_to_tensor(images)
+    label_tensor = tf.convert_to_tensor(labels)
+    new_dataset = tf.data.Dataset.from_tensor_slices((image_tensor, label_tensor))
+    return new_dataset.batch(batch_size) if batch_size is not None else new_dataset
