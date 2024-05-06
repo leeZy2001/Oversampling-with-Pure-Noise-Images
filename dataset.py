@@ -22,15 +22,23 @@ def build_dataset(dataset_config: dict[str, Any]):
     datasets, info = tfds.load(dataset_config["source"], with_info=True)
     training_dataset = datasets["train"]
     testing_dataset = datasets["test"]
+    all_testing = {dataset_config["source"]: testing_dataset}
     if "trimming" in dataset_config:
-        training_dataset = trim_dataset(
+        training_dataset, class_order = trim_dataset(
             training_dataset,
             info.features["label"].num_classes,
             dataset_config["trimming"],
         )
+        alt_testing_dataset, _ = trim_dataset(
+            testing_dataset,
+            info.features["label"].num_classes,
+            dataset_config["trimming"],
+            labels=class_order,
+        )
+        all_testing[dataset_config["name"]] = alt_testing_dataset
     return {
         "training": training_dataset,
-        "testing": testing_dataset,
+        "testing": all_testing,
         "num_classes": info.features["label"].num_classes,
     }
 
@@ -62,20 +70,21 @@ def compute_statistics_from_sorted(organized):
     return tf.math.reduce_mean(tensor), tf.math.reduce_std(tensor)
 
 
-def trim_dataset(dataset, num_classes, trimming_config):
+def trim_dataset(dataset, num_classes, trimming_config, labels=None):
     """Trims a dataset according to the config, in order to construct long-tail variants."""
     organized = sort_dataset(dataset, num_classes)
     scaling_fn = get_scaling_function(trimming_config, num_classes)
     max_size = max(len(l) for l in organized.values())
-    labels = [*organized.keys()]
-    if trimming_config["shuffle_classes"]:
-        random.shuffle(labels)
+    if labels is None:
+        labels = [*organized.keys()]
+        if trimming_config["shuffle_classes"]:
+            random.shuffle(labels)
     for index, label in enumerate(labels):
         if trimming_config["shuffle_files"]:
             random.shuffle(organized[label])
         upper = int(max_size * scaling_fn(index))
         organized[label] = organized[label][:upper]
-    return flatten_dataset(organized)
+    return flatten_dataset(organized), labels
 
 
 def flatten_dataset(organized, shuffle=True):

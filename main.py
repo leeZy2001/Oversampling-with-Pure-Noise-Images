@@ -5,9 +5,7 @@ interface.
 
 import sys
 import os
-
-# Only allow Tensorflow to print errors.
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+import time
 
 from parse import parse_args, parse_toml
 from model.builder import build_model, build_optimizer, build_callbacks
@@ -26,12 +24,19 @@ def main():
     dataset_config = get_dataset_config(args)
     model_configs = get_all_model_configs(args)
 
-    print(f"Building dataset [{dataset_config['dataset']['name']}]...")
+    print(f"Building dataset [{dataset_config['dataset']['name']}]...", end="", flush=True)
+    start = time.perf_counter()
+
     full_training, testing, num_classes, shape = get_dataset_from_config(dataset_config)
 
+    elapsed = time.perf_counter() - start
+    print("%.3fs" % elapsed)
+
+    results = []
     for model_config in model_configs:
         model_name = model_config["model"]["name"]
-        print(f"Building model [{model_name}]...")
+        print(f"Building model [{model_name}]...", end="", flush=True)
+        start = time.perf_counter()
 
         model = build_model(shape, num_classes, model_config["model"])
         optimizer = build_optimizer(model_config["model"])
@@ -43,15 +48,30 @@ def main():
         model.compile(
             optimizer=optimizer, loss=model_config["model"]["loss"], metrics=["accuracy"]
         )
+        elapsed = time.perf_counter() - start
+        print("%.3fs" % elapsed)
 
         if "dataset" in model_config and "augmenting" in model_config["dataset"]:
-            print(f"Augmenting dataset for model [{model_name}]...")
+            print(f"Augmenting dataset for model [{model_name}]...", end="", flush=True)
+            start = time.perf_counter()
+
             personal_training = augment_dataset(full_training, num_classes, shape, model_config["dataset"]["augmenting"])
+
+            elapsed = time.perf_counter() - start
+            print("%.3fs" % elapsed)
         else:
             personal_training = full_training
 
-        print(f"Splitting training and validation for model [{model_name}]...")
+        print(f"Splitting training and validation for model [{model_name}]...", end="", flush=True)
+        start = time.perf_counter()
+
         training, validation = tf.keras.utils.split_dataset(personal_training, right_size=model_config["hyperparams"]["validation_split"])
+
+        elapsed = time.perf_counter() - start
+        print("%.3fs" % elapsed)
+
+        if "dry-run" in args:
+            continue
 
         batch_size = model_config["hyperparams"]["batch_size"]
         print(f"Training model [{model_name}]...")
@@ -63,11 +83,25 @@ def main():
             callbacks=callbacks,
         )
 
-        print(f"Evaluating model [{model_name}]...")
-        results = model.evaluate(into_workable(testing, batch_size=batch_size))
+        results[model_name] = {}
+        for name, dataset in testing.items():
+            print(f"Evaluating model [{model_name}] on testing dataset [{name}]...")
+            results[model_name][name] = model.evaluate(into_workable(dataset, batch_size=batch_size))[1]
 
-        print(results)
+    if "dry-run" in args:
+        print("Dry run complete. Program exiting.")
+        return
 
+    print(f"{'Model'}:^16", end="")
+    dataset_labels = [name for name in testing.items()]
+    for label in dataset_labels:
+        print(f" | {label:<12}")
+    print()
+    for model_name, model_results in results:
+        print(f"{model_name:<16}", end="")
+        for ds in dataset_labels:
+            print(f" | {model_results[ds]:>8.2%}")
+        print()
 
 def verify_necessary_args_are_present(args):
     errors = []
