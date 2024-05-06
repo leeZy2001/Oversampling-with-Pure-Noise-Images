@@ -1,0 +1,28 @@
+[model]
+name = "Johnson"
+optimizer = "adam"
+loss = "sparse_categorical_crossentropy"
+
+
+[[model.layers]]
+layer_type = "conv2d"
+padding = "same"
+filters = 32
+kernel_size = [3, 3]
+
+[[model.layers]]
+layer_type = "relu"
+
+[[model.layers]]
+layer_type = "batchnorm"
+
+[[model.layers]]
+layer_type = "flatten"
+
+[model.output]
+activation = "softmax"
+
+[hyperparams]
+validation_split = 0.2
+batch_size = 32
+epochs = 10

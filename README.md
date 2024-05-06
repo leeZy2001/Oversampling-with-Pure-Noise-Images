@@ -48,5 +48,9 @@ We provide configurations for the following models:
 
 | Model | Description |
 | ----- | ----------- |
-| `reynolds` | A simple model consisting of a Conv2D (with ReLU) and BatchNorm layer. Outputs determined via softmax. Reasonable hyperparameters for quick testing. |
-| `timothee` | Equivalent to `reynolds`, but applies the OPeN dataset augmenting and uses DAR-BN instead of Batch Normalization. |
+| `johnson` | A simple model consisting of a Conv2D (with ReLU) and BatchNorm layer. Outputs determined via softmax. Reasonable hyperparameters for quick testing. |
+| `waltz` | Equivalent to `johnson`, but applies the OPeN dataset augmenting and uses DAR-BN instead of Batch Normalization. 50% of oversampling is replaced with noise. |
+| `reynolds` | Like `johnson`, but with early stopping. |
+| `timothee` | Like `waltz`, but with early stopping. |
+| `stewart` | Equivalent to `johnson`, but performs oversampling on minor classes. |
+| `de-niro` | Equivalent to `waltz`, but only adds noise and does not oversample. |
