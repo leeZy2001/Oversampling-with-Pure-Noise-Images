@@ -15,7 +15,7 @@ python main.py --model=timothee --dataset=cifar10lt
 ```
 
 The following arguments are required:
-- `--model=<VALUE>`: The model configuration to use. Found at `configs/model-<VALUE>.toml`.
+- `--model=<VALUE>`: The model configuration to use. Found at `configs/model-<VALUE>.toml`. More than one model may be specified as a comma-separated list.
 - `--dataset=<VALUE>`: The dataset configuration to use. Found at `configs/dataset-<VALUE>.toml`
 
 The following arguments are optional:
@@ -23,3 +23,30 @@ The following arguments are optional:
 
 More arguments may be added as functionality expands.
 
+### Notes on Usage
+
+The construction of Long-Tail dataset variants is **non-deterministic**. In order to properly test two models off the same dataset, you **must** specify all of those models in the same program run.
+
+## Default Configurations
+
+We provide a number of configurations for preliminary tests. Users are encouraged to create their own.
+
+### Datasets
+
+We provide configurations for the following datasets:
+
+| Dataset | Description |
+| ------- | ----------- |
+| `cifar10` | The CIFAR-10 dataset we know and love. |
+| `cifar10lt` | The CIFAR-10 dataset with samples discarded at random. The largest class will have all of its samples, and the smallest class will have 10% of its samples. The class sizes will be calculated as a linear function. |
+| `cifar100` | The CIFAR-100 dataset we know and love. |
+| `cifar100lt` | The same technique is applied to the CIFAR-100 dataset as with `cifar10lt` |
+
+### Models
+
+We provide configurations for the following models:
+
+| Model | Description |
+| ----- | ----------- |
+| `reynolds` | A simple model consisting of a Conv2D (with ReLU) and BatchNorm layer. Outputs determined via softmax. Reasonable hyperparameters for quick testing. |
+| `timothee` | Equivalent to `reynolds`, but applies the OPeN dataset augmenting and uses DAR-BN instead of Batch Normalization. |
