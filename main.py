@@ -82,7 +82,7 @@ def full_evaluation_cycle(args, dataset_config, model_configs):
         print("Dry run complete. Program exiting.")
         return
 
-    print(f"{'Model'}:^16", end="")
+    print(f"{'Model':^16}", end="")
     dataset_labels = [name for name in testing.keys()]
     for label in dataset_labels:
         print(f" | {label:<12}", end="")
