@@ -1,5 +1,5 @@
 [model]
-name = "Timothee"
+name = "Chalamet"
 optimizer = "adam"
 loss = "sparse_categorical_crossentropy"
 
