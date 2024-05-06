@@ -93,7 +93,7 @@ def main():
         return
 
     print(f"{'Model'}:^16", end="")
-    dataset_labels = [name for name in testing.items()]
+    dataset_labels = [name for name in testing.keys()]
     for label in dataset_labels:
         print(f" | {label:<12}")
     print()
