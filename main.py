@@ -90,7 +90,7 @@ def full_evaluation_cycle(args, dataset_config, model_configs):
     for model_name, model_results in results.items():
         print(f"{model_name:<16}", end="")
         for ds in dataset_labels:
-            print(f" | {model_results[ds]:>8.2%}")
+            print(f" | {model_results[ds]:>8.2%}", end="")
         print()
     
 
