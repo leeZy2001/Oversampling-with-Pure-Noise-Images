@@ -11,7 +11,7 @@ Required libraries are listed in `requirements.txt`. On Python versions prior to
 This program is primarily intended to be ran through the command line.
 
 ```bash
-python main.py --model=timothee --dataset=cifar10lt
+python main.py --model=johnson,waltz --dataset=cifar10lt
 ```
 
 The following arguments are required:
