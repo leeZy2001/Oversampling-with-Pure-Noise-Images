@@ -19,9 +19,8 @@ The following arguments are required:
 - `--dataset=<VALUE>`: The dataset configuration to use. Found at `configs/dataset-<VALUE>.toml`
 
 The following arguments are optional:
+- `--runs=<VALUE>`: Indicates the number of runs to perform. Helps with datasets where many random decisions are made. Defaults to `1`.
 - `--dry-run`: Indicates that a dry run should be performed. The dataset and model are compiled, but training and evaluation are skipped.
-
-More arguments may be added as functionality expands.
 
 ### Notes on Usage
 

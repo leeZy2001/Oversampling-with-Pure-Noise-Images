@@ -13,17 +13,7 @@ from dataset import build_dataset, augment_dataset, into_workable
 import tensorflow as tf
 
 
-def main():
-    """
-    Configures and tests a model on a dataset according to command-line
-    arguments.
-    """
-    args = parse_args(sys.argv[1:])
-    verify_necessary_args_are_present(args)
-
-    dataset_config = get_dataset_config(args)
-    model_configs = get_all_model_configs(args)
-
+def full_evaluation_cycle(args, dataset_config, model_configs):
     print(f"Building dataset [{dataset_config['dataset']['name']}]...", end="", flush=True)
     start = time.perf_counter()
 
@@ -95,13 +85,31 @@ def main():
     print(f"{'Model'}:^16", end="")
     dataset_labels = [name for name in testing.keys()]
     for label in dataset_labels:
-        print(f" | {label:<12}")
+        print(f" | {label:<12}", end="")
     print()
-    for model_name, model_results in results:
+    for model_name, model_results in results.items():
         print(f"{model_name:<16}", end="")
         for ds in dataset_labels:
             print(f" | {model_results[ds]:>8.2%}")
         print()
+    
+
+def main():
+    """
+    Configures and tests a model on a dataset according to command-line
+    arguments.
+    """
+    args = parse_args(sys.argv[1:])
+    verify_necessary_args_are_present(args)
+
+    dataset_config = get_dataset_config(args)
+    model_configs = get_all_model_configs(args)
+
+    runs = args["runs"] if "runs" in args else 1
+    for run in range(runs):
+        print(f"Performing run {run+1} of {runs}")
+        full_evaluation_cycle(args, dataset_config, model_configs)
+
 
 def verify_necessary_args_are_present(args):
     errors = []
