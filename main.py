@@ -32,7 +32,7 @@ def main():
     elapsed = time.perf_counter() - start
     print("%.3fs" % elapsed)
 
-    results = []
+    results = {}
     for model_config in model_configs:
         model_name = model_config["model"]["name"]
         print(f"Building model [{model_name}]...", end="", flush=True)
