@@ -1,12 +1,7 @@
 [model]
-name = "Timothee"
+name = "Reynolds"
 optimizer = "adam"
 loss = "sparse_categorical_crossentropy"
-
-
-[dataset.augmenting]
-pad_to_percent = 1.0
-replace_with_noise = 0.5
 
 
 [[model.layers]]
@@ -19,7 +14,7 @@ kernel_size = [3, 3]
 layer_type = "relu"
 
 [[model.layers]]
-layer_type = "darbn"
+layer_type = "batchnorm"
 
 [[model.layers]]
 layer_type = "flatten"
@@ -33,7 +28,6 @@ callback_type = "early_stopping"
 monitor = "val_loss"
 min_delta = 1e-2
 patience = 5
-
 
 [hyperparams]
 validation_split = 0.2

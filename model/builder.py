@@ -53,6 +53,8 @@ def build_layer(layer_type, **options):
             return layers.ReLU(**options)
         case "darbn":
             return CustomDARBN(**options)
+        case "batchnorm":
+            return layers.BatchNormalization(**options)
         case "flatten":
             return layers.Flatten(**options)
     return None
