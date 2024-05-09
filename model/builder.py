@@ -57,4 +57,6 @@ def build_layer(layer_type, **options):
             return layers.BatchNormalization(**options)
         case "flatten":
             return layers.Flatten(**options)
+        case "dense":
+            return layers.Dense(**options)
     return None

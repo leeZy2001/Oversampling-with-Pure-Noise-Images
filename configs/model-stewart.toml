@@ -24,6 +24,10 @@ layer_type = "batchnorm"
 [[model.layers]]
 layer_type = "flatten"
 
+[[model.layers]]
+layer_type = "dense"
+units = 200
+
 [model.output]
 activation = "softmax"
 
@@ -31,4 +35,4 @@ activation = "softmax"
 [hyperparams]
 validation_split = 0.2
 batch_size = 32
-epochs = 10
+epochs = 20
